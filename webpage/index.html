@@ -3,8 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Webpage</title>
+    
+    <title>Arduino Current Meter</title>
+    
     <link rel="stylesheet" href="css/main.css">
+    <script>
+        function fetchData() {
+            fetch('http://localhost:8080')
+                .then(response => response.json())
+                .then(data => {
+                    const dataContainer = document.getElementById('data-container');
+                    dataContainer.innerHTML = ''; // Clear existing data
+                    
+                    // Assuming `data` is a single object, not an array
+                    const dataElement = document.createElement('div');
+                    dataElement.textContent = `Current: ${data.current}`;
+                    dataContainer.appendChild(dataElement);
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        }
+
+        // Set an interval to fetch data every second
+        window.onload = () => {
+            fetchData(); // Fetch data immediately on load
+            setInterval(fetchData, 1000); 
+        };
+    </script>
 </head>
 <body>
     <header>
@@ -12,13 +38,12 @@
     </header>
     
     <main>
-        <p>This is a simple test page.</p>
+        <div id="data-container"></div>
     </main>
     
     <footer>
         <p>Arduino Current Meter. &copy; 2024 Test Webpage.</p>
     </footer>
     
-    <script src="js/main.js"></script>
 </body>
 </html>

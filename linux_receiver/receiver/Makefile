@@ -9,3 +9,6 @@ receiver.o: receiver.c receiver.h
 
 misc.o: misc.c
 	$(CC) $(CFLAGS) -c misc.c
+
+server.o: server.c
+	$(CC) $(CFLAGS) -c server.c
