@@ -70,7 +70,6 @@ int main(int argc, const char** argv) {
     }
   }
 
-  close(fd);
 
   return 0;
 }
@@ -93,8 +92,8 @@ void start_http_server(int port) {
   // Create socket
   server_socket = socket(AF_INET, SOCK_STREAM, 0);
   if (server_socket < 0) {
-      perror("Socket creation failed");
-      exit(EXIT_FAILURE);
+    perror("Socket creation failed");
+    exit(EXIT_FAILURE);
   }
 
   // Bind socket to port
@@ -102,16 +101,16 @@ void start_http_server(int port) {
   server_addr.sin_addr.s_addr = INADDR_ANY;
   server_addr.sin_port = htons(port);
   if (bind(server_socket, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
-      perror("Socket bind failed");
-      close(server_socket);
-      exit(EXIT_FAILURE);
+    perror("Socket bind failed");
+    close(server_socket);
+    exit(EXIT_FAILURE);
   }
 
   // Listen for incoming connections
   if (listen(server_socket, 10) < 0) {
-      perror("Listen failed");
-      close(server_socket);
-      exit(EXIT_FAILURE);
+    perror("Listen failed");
+    close(server_socket);
+    exit(EXIT_FAILURE);
   }
 
   printf("Server is listening on port %d\n", port);
@@ -128,24 +127,52 @@ void start_http_server(int port) {
 void handle_client(int client_socket) {
   char buffer[1024];
   char response[1024];
-  int number_to_send = 42; // Example number to send
   int read_size;
+  float current = 0;
 
-  // Create the response with CORS headers
-    snprintf(response, sizeof(response),
-             "HTTP/1.1 200 OK\r\n"
-             "Content-Type: application/json\r\n"
-             "Content-Length: %zu\r\n"
-             "Access-Control-Allow-Origin: *\r\n"
-             "Access-Control-Allow-Methods: GET, POST, OPTIONS\r\n"
-             "Access-Control-Allow-Headers: Content-Type\r\n"
-             "\r\n"
-             "{\"number\": %d}",
-             strlen("{\"number\": 42}"), number_to_send);
+  while(1){
+    char mode = 'o';
 
-  // Send the response
-  write(client_socket, response, strlen(response));
+    // online mode 
+    if (mode == 'o') {
+      //read from stdin
+      uint8_t sampling_interval = 1;  
+      if(sampling_interval == 0){      
+        return -1;
+      }
 
+      //send sampling_interval itself, 
+      //it fits into a byte since it can only go up to 60
+      UART_send_special_message(fd, sampling_interval);
+
+      //read data from arduino
+      while(1){
+        amp_value amp = UART_read_amp(fd);
+        print_amp(amp,1);
+
+        //send data to webpage
+        current = amp.current * 1000;
+        
+        // Create the response with CORS headers
+        int content_length = snprintf(NULL, 0, "{\"current\": %.2f}", current);
+        snprintf(response, sizeof(response),
+                  "HTTP/1.1 200 OK\r\n"
+                  "Content-Type: application/json\r\n"
+                  "Content-Length: %d\r\n"
+                  "Access-Control-Allow-Origin: *\r\n"
+                  "Access-Control-Allow-Methods: GET, POST, OPTIONS\r\n"
+                  "Access-Control-Allow-Headers: Content-Type\r\n"
+                  "\r\n"
+                  "{\"current\": %.2f}",
+                  content_length, current);
+
+        // Send the response
+        write(client_socket, response, strlen(response));
+        printf("Data sent to webpage: %.2f\n", current);
+      }
+    }
+  }
 
   close(client_socket);
+  close(fd);
 }
