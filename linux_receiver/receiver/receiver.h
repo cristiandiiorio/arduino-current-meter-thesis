@@ -8,6 +8,16 @@
 
 #include "../avr_common/common.h"
 
+//http requests
+#include <arpa/inet.h>
+
+#define RESPONSE "HTTP/1.1 200 OK\r\n" \
+                 "Content-Type: text/plain\r\n" \
+                 "Content-Length: 13\r\n" \
+                 "\r\n" \
+                 "Hello, World!"
+
+#define PORT 8080
 #define blocking_status 1
 #define BAUDRATE 19200
 
@@ -35,3 +45,7 @@ void UART_send_special_message(int fd, char msg);
 void signal_handler(int signum);
 
 void print_query(int fd);
+
+void start_http_server(int port);
+
+void handle_client(int client_socket);

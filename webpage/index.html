@@ -5,6 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test Webpage</title>
     <link rel="stylesheet" href="css/main.css">
+    <script>
+        function fetchData() {
+            fetch('http://localhost:8080')
+                .then(response => response.json())
+                .then(data => {
+                    const dataContainer = document.getElementById('data-container');
+                    dataContainer.innerHTML = ''; // Clear existing data
+                    
+                    // Assuming `data` is a single object, not an array
+                    const dataElement = document.createElement('div');
+                    dataElement.textContent = `Number: ${data.number}`;
+                    dataContainer.appendChild(dataElement);
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        }
+    </script>
 </head>
 <body>
     <header>
@@ -12,13 +30,14 @@
     </header>
     
     <main>
-        <p>This is a simple test page.</p>
+        <h1>Received Data</h1>
+        <button onclick="fetchData()">Fetch Data</button>
+        <div id="data-container"></div>
     </main>
     
     <footer>
         <p>Arduino Current Meter. &copy; 2024 Test Webpage.</p>
     </footer>
     
-    <script src="js/main.js"></script>
 </body>
 </html>
