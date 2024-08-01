@@ -9,6 +9,3 @@ receiver.o: receiver.c receiver.h
 
 misc.o: misc.c
 	$(CC) $(CFLAGS) -c misc.c
-
-clean:
-	rm -f receiver receiver.o misc.o

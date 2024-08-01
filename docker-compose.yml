@@ -1,7 +1,21 @@
 services:
-  web:
-    build: .
+  webpage:
+    build:
+      context: ./webpage
+      dockerfile: Dockerfile
+    container_name: webpage
     ports:
       - "5000:80"
     volumes:
       - ./webpage:/usr/share/nginx/html
+
+  receiver:
+    build:
+      context: ./linux_receiver
+      dockerfile: Dockerfile
+    container_name: receiver
+    devices:
+      - "/dev/ttyUSB0:/dev/ttyUSB0"
+    command: ["./receiver/receiver", "/dev/ttyUSB0"]
+    stdin_open: true
+    tty: true
