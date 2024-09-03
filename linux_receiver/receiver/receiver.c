@@ -21,55 +21,7 @@ int main(int argc, const char** argv) {
   serial_set_blocking(fd, blocking_status);
 
   //server setup
-  start_http_server(PORT);
-
-  while(1){
-    //read from stdin
-    char mode = 'o';
-
-    // online mode 
-    if (mode == 'o') {
-      //read from stdin
-      uint8_t sampling_interval = 1;  
-      if(sampling_interval == 0){      
-        return -1;
-      }
-
-      //send sampling_interval itself, 
-      //it fits into a byte since it can only go up to 60
-      UART_send_special_message(fd, sampling_interval);
-
-      //read data from arduino
-      while(1){
-        amp_value amp = UART_read_amp(fd);
-        print_amp(amp,1);
-        //send data to webpage
-
-      }
-    }
-
-    // clearing mode
-    else if (mode == 'c') {
-      //read from stdin
-      char confirmation = input_confirmation();
-      
-      if (confirmation == 'Y') {
-        //send special_message to arduino to clear data
-        UART_send_special_message(fd, mode);
-        //read response from arduino to check for confirmation
-        amp_value amp = UART_read_amp(fd);
-        
-        //check to see if memory has been cleared
-        if(amp.current == -1){
-          printf("Memory cleared\n");
-        }
-        else{
-          printf("Memory not cleared\n");
-        }
-      }
-    }
-  }
-
+  start_http_server(PORT); //TODO: rewrite everything to make it more readable
 
   return 0;
 }
