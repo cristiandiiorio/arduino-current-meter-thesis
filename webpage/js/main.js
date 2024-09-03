@@ -13,6 +13,8 @@ function fetchData() {
         })
         .then(data => {
             document.getElementById('data-container').textContent = `Current: ${data.current}`;
+            console.log(data.current);
+            console.log(new Date());
         })
         .catch(error => {
             console.error('There was a problem with the fetch operation:', error);

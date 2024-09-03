@@ -20,8 +20,7 @@ int main(int argc, const char** argv) {
   serial_set_interface_attribs(fd, BAUDRATE, 0);
   serial_set_blocking(fd, blocking_status);
 
-  //server setup
-  start_http_server(PORT); //TODO: rewrite everything to make it more readable
+  start_http_server(PORT);
 
   return 0;
 }
@@ -38,7 +37,7 @@ void signal_handler(int signum){
 
 void start_http_server(int port) {
   struct sockaddr_in server_addr, client_addr;
-  int server_socket, client_socket;
+  int server_socket, *new_sock;
   socklen_t client_addr_len = sizeof(client_addr);
 
   // Create socket
@@ -68,12 +67,40 @@ void start_http_server(int port) {
   printf("Server is listening on port %d\n", port);
 
   // Accept incoming connections and handle them
-  while ((client_socket = accept(server_socket, (struct sockaddr *)&client_addr, &client_addr_len)) >= 0) {
-    handle_client(client_socket);
+  while (1) {
+    new_sock = malloc(sizeof(int));  // Allocate memory to hold the client socket
+    if (new_sock == NULL) {
+      perror("Failed to allocate memory for socket descriptor");
+      continue;
+    }
+
+    *new_sock = accept(server_socket, (struct sockaddr *)&client_addr, &client_addr_len);
+    if (*new_sock < 0) {
+      perror("Accept failed");
+      free(new_sock);
+      continue;
+    }
+
+    pthread_t thread_id;
+    if (pthread_create(&thread_id, NULL, client_handler, (void*)new_sock) != 0) {
+      perror("Could not create thread");
+      close(*new_sock);
+      free(new_sock);
+    }
+
+    pthread_detach(thread_id);  // Detach the thread to free resources after it's done
   }
 
-  close(server_socket);
+  close(server_socket); // This line will actually never be reached in this setup
 }
+
+void* client_handler(void* arg) {
+  int client_socket = *(int*)arg;
+  free(arg);  // Free the allocated memory for the socket descriptor
+  handle_client(client_socket);
+  pthread_exit(NULL);
+}
+
 
 // Function to handle HTTP requests and send a number
 void handle_client(int client_socket) {

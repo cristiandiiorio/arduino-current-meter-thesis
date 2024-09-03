@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra
+CFLAGS = -Wall -Wextra -lpthread
 
 receiver: receiver.o misc.o
 	$(CC) $(CFLAGS) -o receiver receiver.o misc.o
