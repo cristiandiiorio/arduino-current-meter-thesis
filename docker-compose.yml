@@ -1,4 +1,19 @@
 services:
+  receiver:
+    build:
+      context: ./linux_receiver
+      dockerfile: Dockerfile
+    container_name: receiver
+    devices:
+      - "/dev/ttyUSB0:/dev/ttyUSB0"
+    volumes:
+      - shared_data:/app/receiver/data
+    command: ["./receiver/receiver", "/dev/ttyUSB0"]
+    stdin_open: true
+    tty: true
+    ports:
+      - "8080:8080"
+
   webpage:
     build:
       context: ./webpage
@@ -8,16 +23,7 @@ services:
       - "5000:80"
     volumes:
       - ./webpage:/usr/share/nginx/html
+      - shared_data:/usr/share/nginx/html/data
 
-  receiver:
-    build:
-      context: ./linux_receiver
-      dockerfile: Dockerfile
-    container_name: receiver
-    devices:
-      - "/dev/ttyUSB0:/dev/ttyUSB0"
-    command: ["./receiver/receiver", "/dev/ttyUSB0"]
-    stdin_open: true
-    tty: true
-    ports:
-      - "8080:8080"
+volumes:
+  shared_data:

@@ -7,19 +7,38 @@
     <title>Arduino Current Meter</title>
     
     <link rel="stylesheet" href="css/main.css">
-    <script src="../js/main.js"></script>
+    <script>
+        async function fetchLastValue() {
+          try {
+            const response = await fetch('/data/data.txt');
+            const data = await response.text();
+            
+            // Split by newlines and get the last non-empty line
+            const lines = data.trim().split('\n');
+            const lastValue = lines[lines.length - 1];
+            
+            // Display the last value
+            document.getElementById('data-container').textContent = lastValue;
+          } catch (error) {
+            console.error('Error fetching the last value:', error);
+          }
+        }
+    
+        // Update the last value every 5 seconds
+        setInterval(fetchLastValue, 1000);
+      </script>
 </head>
-<body>
+<body onload="fetchLastValue()">
     <header>
         <h1>Arduino Current Meter</h1>
     </header>
     
     <main>
-        <div id="data-container"></div>
+        <div id="data-container">Loading data...</div>
     </main>
     
     <footer>
-        <p>Arduino Current Meter. &copy; 2024 Test Webpage.</p>
+        <p>Arduino Current Meter. &copy; Cristian Di Iorio 2024.</p>
     </footer>
     
 </body>

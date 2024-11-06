@@ -146,29 +146,6 @@ char input_mode(void){
   }
 }
 
-uint8_t get_input_sampling(void){
-  char input[4]; //Maximum of 60 seconds ==> 2 chars
-  uint8_t sampling_interval;
-  printf("Desired sampling interval: ");
-  if (fgets(input, sizeof(input), stdin)) {
-    if(input[2] == '\n' || input[2] == '\0'){ //correct length
-      sampling_interval = atoi(input);
-      if (sampling_interval > 60) { //correct interval
-        printf("Wrong sampling interval\n");
-        return 0;
-      }
-      return sampling_interval;
-    }
-    else {
-      printf("You have entered more than two characters!\n");
-      return 0;
-    }
-  } 
-  else {
-    printf("Error reading input\n");
-    return 0;
-  }
-}
 
 char input_confirmation(void){
   char input[3];
