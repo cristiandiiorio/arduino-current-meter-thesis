@@ -11,8 +11,6 @@ services:
     command: ["./receiver/receiver", "/dev/ttyUSB0"]
     stdin_open: true
     tty: true
-    ports:
-      - "8080:8080"
 
   webpage:
     build:
