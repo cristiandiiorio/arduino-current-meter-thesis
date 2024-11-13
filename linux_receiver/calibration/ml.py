@@ -10,7 +10,7 @@ model = LinearRegression()
 model.fit(sensor_values, real_values)
 
 #Get the parameters of the linear model
-a = model.coef_[0]
-b = model.intercept_
+CALIBRATION1 = model.coef_[0]
+CALIBRATION2 = model.intercept_
 
-print(a,b)
+print(CALIBRATION1,CALIBRATION2)
